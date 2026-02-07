@@ -1,0 +1,129 @@
+<?php
+$postsFile = __DIR__ . '/posts.json';
+$posts = [];
+
+if (file_exists($postsFile)) {
+  $json = file_get_contents($postsFile);
+  $posts = json_decode($json, true);
+  if (!is_array($posts)) $posts = [];
+}
+
+// mostrar lo más nuevo primero
+$posts = array_reverse($posts);
+?>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mis Fotos + Links</title>
+  <style>
+    :root{
+      --bg:#070812; --card:#0e1030; --txt:#e9ecff;
+      --neon1:#00e5ff; --neon2:#ff2bd6; --neon3:#7cff00;
+    }
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(255,43,214,.25), transparent 55%),
+                  radial-gradient(1200px 600px at 80% 0%, rgba(0,229,255,.22), transparent 55%),
+                  radial-gradient(900px 500px at 50% 100%, rgba(124,255,0,.12), transparent 55%),
+                  var(--bg);
+      color:var(--txt);
+      min-height:100vh;
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:18px;}
+    header{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:14px 16px; border-radius:18px;
+      background: rgba(14,16,48,.55);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: 0 0 25px rgba(0,229,255,.12), 0 0 30px rgba(255,43,214,.08);
+      backdrop-filter: blur(10px);
+    }
+    h1{margin:0; font-size:18px; letter-spacing:.4px}
+    .btn{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:14px; text-decoration:none; color:var(--txt);
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(90deg, rgba(0,229,255,.20), rgba(255,43,214,.18));
+      box-shadow: 0 0 18px rgba(0,229,255,.18);
+    }
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap:14px;
+    }
+    .card{
+      border-radius:18px;
+      overflow:hidden;
+      background: rgba(14,16,48,.55);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: 0 0 24px rgba(255,43,214,.08), 0 0 22px rgba(0,229,255,.07);
+      backdrop-filter: blur(10px);
+    }
+    .img{
+      width:100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      display:block;
+      filter: saturate(1.15) contrast(1.05);
+    }
+    .content{padding:12px 12px 14px}
+    .title{
+      font-weight:700; margin:0 0 6px; font-size:15px;
+      text-shadow: 0 0 10px rgba(0,229,255,.18);
+    }
+    .meta{opacity:.85; font-size:13px; margin:0 0 10px}
+    .link{
+      display:inline-block;
+      padding:9px 12px;
+      border-radius:12px;
+      color:var(--txt);
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(90deg, rgba(124,255,0,.16), rgba(0,229,255,.16), rgba(255,43,214,.14));
+      box-shadow: 0 0 14px rgba(124,255,0,.10), 0 0 18px rgba(0,229,255,.10);
+    }
+    .empty{
+      margin-top:18px; padding:18px; border-radius:18px;
+      background: rgba(14,16,48,.45);
+      border:1px dashed rgba(255,255,255,.16);
+    }
+    footer{opacity:.7; font-size:12px; margin:18px 4px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>📸 Mis Fotos </h1>
+      <a class="btn" href="upload.php">➕ Subir foto</a>
+    </header>
+
+    <?php if (count($posts) === 0): ?>
+      <div class="empty">
+        Todavía no hay fotos publicadas. Tocá <b>“Subir foto”</b> para publicar tu primera foto con link.
+      </div>
+    <?php else: ?>
+      <div class="grid">
+        <?php foreach ($posts as $p): ?>
+          <div class="card">
+            <img class="img" src="<?php echo htmlspecialchars($p['image']); ?>" alt="Foto" />
+            <div class="content">
+              <p class="title"><?php echo htmlspecialchars($p['title']); ?></p>
+              <p class="meta"><?php echo htmlspecialchars($p['date']); ?></p>
+              <?php if (!empty($p['link'])): ?>
+                <a class="link" href="<?php echo htmlspecialchars($p['link']); ?>" target="_blank" rel="noopener">
+                  Abrir link ↗
+                </a>
+              <?php endif; ?>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+
+    <footer>Hecho para publicar fotos desde tu galería + un link por foto.</footer>
+  </div>
+</body>
+</html>
